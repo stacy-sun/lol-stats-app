@@ -15,14 +15,16 @@ const App = () => {
 
   const getData = async () => {
     if (name) {
-      setIsLoading(true)
-      const res = await fetch(`${BASE_URL}/?name=${name}`);
-      const resData = await res.json();
-
-      if (resData.data.length) {
+      try {
+        setIsLoading(true);
+        const res = await fetch(`${BASE_URL}/?name=${name}`);
+        const resData = await res.json();
         setResults(resData.data);
         setIsLoading(false);
-      } else setError('There is an error occured.');
+      } catch (error) {
+        setIsLoading(false);
+        setError('There is an error occured.');
+      }
     } else {
       setError('Required');
     }
@@ -34,7 +36,13 @@ const App = () => {
         <Col sm={{ size: 6, offset: 3 }} className="header-container">
           <h1>League Stats</h1>
           <div className="search-container">
-            <Input type="text" onChange={e => setName(e.target.value)} />
+            <Input
+              type="text"
+              onChange={e => {
+                setName(e.target.value);
+                setResults([]);
+              }}
+            />
             <Button onClick={getData} color="primary">Submit</Button>
           </div>
           {error && <p>{error}</p>}
